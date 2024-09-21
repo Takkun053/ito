@@ -5,11 +5,17 @@ description = "An app for bridging I/O between multiple computers."
 authors = ["Takkun053 <takkun.053@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.12,<3.14"
 flet = "^0.24.1"
+pystray = "^0.19.5"
+rich = "^13.8.1"
 
+
+[tool.poetry.group.dev.dependencies]
+pyinstaller = "^6.10.0"
 
 [build-system]
 requires = ["poetry-core"]
