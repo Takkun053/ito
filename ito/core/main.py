@@ -1,10 +1,12 @@
 import os
+import sys
 import logging
 from logging.handlers import RotatingFileHandler
 
 from rich.logging import RichHandler
+import psutil
 import pystray
-from PIL import Image, ImageDraw
+from PIL import Image
 
 
 # Logging
@@ -18,6 +20,7 @@ logger.addHandler(stream_handler)
 log_folder = os.path.join(os.path.dirname(__file__), "../logs")
 if not os.path.isdir(log_folder):
     os.mkdir(log_folder)
+
 file_handler = RotatingFileHandler(
     filename=os.path.join(log_folder, "core.log"), encoding="utf-8", maxBytes=1024*1024, backupCount=5)
 file_handler.setLevel(logging.INFO)
@@ -26,16 +29,25 @@ file_handler.setFormatter(logging.Formatter(
 logger.addHandler(file_handler)
 
 
+# Double active check
+pid_file = os.path.join(os.path.dirname(__file__), "../core_pid.txt")
+
+if os.path.exists(pid_file):
+    with open(pid_file, "r") as f:
+        pid = int(f.read())
+    if psutil.pid_exists(pid):
+        logger.error(f"Program is already running with PID {pid}.")
+        sys.exit(0)
+
+with open(pid_file, "w") as f:
+    f.write(str(os.getpid()))
+
+
+def main(icon: pystray._base.Icon):
+    icon.visible = True
+
+
 # Task tray
-def create_image(width, height, color1, color2):
-    image = Image.new('RGB', (width, height), color1)
-    dc = ImageDraw.Draw(image)
-    dc.rectangle((width // 2, 0, width, height // 2), fill=color2)
-    dc.rectangle((0, height // 2, width // 2, height), fill=color2)
-    return image
-
-
-logger.info("Task is starting.")
-
-task_icon = pystray.Icon("ItO", create_image(64, 64, 'black', 'white'))
-task_icon.run()
+icon_file = os.path.join(os.path.dirname(__file__), "../assets/ito.png")
+task_icon = pystray.Icon("ito", Image.open(icon_file), "ItO")
+task_icon.run(server.main)

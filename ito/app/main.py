@@ -3,6 +3,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 from rich.logging import RichHandler
+import flet as ft
 
 
 # Logging
@@ -22,3 +23,13 @@ file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(logging.Formatter(
     "[%(asctime)s] %(levelname)s %(filename)s:%(lineno)d [%(name)s] %(message)s"))
 logger.addHandler(file_handler)
+
+
+# Main
+def main(page: ft.Page):
+    t = ft.Text(value="Hello, world!", color="green")
+    page.controls.append(t)
+    page.update()
+
+
+ft.app(main)

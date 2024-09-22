@@ -1,6 +1,9 @@
 {
     "cSpell.words": [
+        "flet",
+        "getpid",
         "levelname",
+        "psutil",
         "pystray",
         "tracebacks"
     ]

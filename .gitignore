@@ -162,3 +162,4 @@ cython_debug/
 #.idea/
 
 *.log.[0-9]
+core_pid.txt

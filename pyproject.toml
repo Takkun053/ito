@@ -12,6 +12,7 @@ python = ">=3.12,<3.14"
 flet = "^0.24.1"
 pystray = "^0.19.5"
 rich = "^13.8.1"
+psutil = "^6.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
