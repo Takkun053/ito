@@ -8,6 +8,11 @@ import psutil
 import pystray
 from PIL import Image
 
+import server
+
+
+PRODUCT = getattr(sys, "frozen", False)
+
 
 # Logging
 logger = logging.getLogger()
@@ -30,24 +35,40 @@ logger.addHandler(file_handler)
 
 
 # Double active check
-pid_file = os.path.join(os.path.dirname(__file__), "../core_pid.txt")
+lock_file = os.path.join(os.path.dirname(__file__), "../core.lock")
 
-if os.path.exists(pid_file):
-    with open(pid_file, "r") as f:
-        pid = int(f.read())
-    if psutil.pid_exists(pid):
+if os.path.exists(lock_file):
+    with open(lock_file) as f:
+        lock_data = f.read().split("\n")
+        pid = int(lock_data[0])
+
+    if psutil.pid_exists(pid) and str(psutil.Process(pid).create_time()) == lock_data[1]:
         logger.error(f"Program is already running with PID {pid}.")
-        sys.exit(0)
+        sys.exit()
+    else:
+        os.remove(lock_file)
 
-with open(pid_file, "w") as f:
-    f.write(str(os.getpid()))
+with open(lock_file, "w") as f:
+    f.write(str(os.getpid()) + "\n" +
+            str(psutil.Process(os.getpid()).create_time()))
 
 
+# Arg check
+if len(sys.argv) <= 1:
+    logger.error("Insufficient number of arguments.")
+    sys.exit()
+
+
+# Main
 def main(icon: pystray._base.Icon):
     icon.visible = True
+    match sys.argv[1]:
+        case "run":
+            server.main(icon)
 
 
 # Task tray
-icon_file = os.path.join(os.path.dirname(__file__), "../assets/ito.png")
+icon_file = os.path.join(os.path.dirname(
+    __file__), "assets/ito.png" if PRODUCT else "../assets/ito.png")
 task_icon = pystray.Icon("ito", Image.open(icon_file), "ItO")
-task_icon.run(server.main)
+task_icon.run(main)
